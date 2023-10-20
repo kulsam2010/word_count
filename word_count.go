@@ -39,10 +39,13 @@ func main() {
 
 	file, err := os.Open(fileName)
 
-	if errors.Is(err, fs.ErrPermission) {
-		fmt.Printf("%s: open: Permission denied \n", fileName)
-	} else {
-		fmt.Printf("%s: open: Permission denied \n", fileName)
+	if err != nil {
+		if errors.Is(err, fs.ErrPermission) {
+			fmt.Printf("%s: open: Permission denied \n", fileName)
+		} else {
+			fmt.Printf("%s: open: Permission denied \n", fileName)
+		}
+		return
 	}
 
 	defer file.Close()
@@ -65,9 +68,9 @@ func main() {
 	}
 
 	if *countLines {
-		fmt.Printf("%d %s\n", lineCount, fileName)
+		fmt.Printf("    %d %s\n", lineCount, fileName)
 	} else {
-		fmt.Printf("%d %s\n", wordCount, fileName)
+		fmt.Printf("    %d %s\n", wordCount, fileName)
 	}
 
 }
