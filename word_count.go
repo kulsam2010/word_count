@@ -54,10 +54,8 @@ func main() {
 
 	for scanner.Scan() {
 		lineCount++
-
 		if *countWords {
-			words := strings.Fields(scanner.Text())
-			wordCount += len(words)
+			wordCount += countWordsInString(scanner.Text())
 		}
 	}
 
@@ -72,4 +70,8 @@ func main() {
 		fmt.Printf("%d %s\n", wordCount, fileName)
 	}
 
+}
+
+func countWordsInString(str string) int {
+	return len(strings.Fields(str))
 }
