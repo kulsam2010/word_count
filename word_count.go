@@ -73,9 +73,12 @@ func countLinesAndWords(cmd *cobra.Command, args []string) {
 	wordCount := 0
 
 	for scanner.Scan() {
-		lineCount++
-		if countWords {
-			wordCount += countWordsInString(scanner.Text())
+		lineStr := scanner.Text()
+		if len(strings.TrimSpace(lineStr)) > 0 {
+			lineCount++
+			if countWords {
+				wordCount += countWordsInString(lineStr)
+			}
 		}
 	}
 
