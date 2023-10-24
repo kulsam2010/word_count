@@ -3,26 +3,43 @@ package main
 import (
 	"bufio"
 	"errors"
-	"flag"
 	"fmt"
 	"io/fs"
 	"os"
 	"strings"
+
+	"github.com/spf13/cobra"
 )
 
+var rootCmd = &cobra.Command{Use: "wc"}
+
 func main() {
-
-	countLines := flag.Bool("l", false, "line count")
-	countWords := flag.Bool("w", false, "word count")
-
-	flag.Parse()
-
-	if flag.NArg() != 1 {
-		fmt.Println("Usage: word_count [-w | -l] <filename>")
-		return
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	fileName := flag.Arg(0)
+}
+
+func init() {
+	rootCmd.AddCommand(countLinesAndWordsCmd)
+	countLinesAndWordsCmd.Flags().BoolP("lines", "l", false, "Count lines")
+	countLinesAndWordsCmd.Flags().BoolP("words", "w", false, "Count words")
+
+}
+
+var countLinesAndWordsCmd = &cobra.Command{
+	Use:   "wc [file]",
+	Short: "Count lines or words in a file",
+	Args:  cobra.ExactArgs(1),
+	Run:   countLinesAndWords,
+}
+
+func countLinesAndWords(cmd *cobra.Command, args []string) {
+	countLines, _ := cmd.Flags().GetBool("lines")
+	countWords, _ := cmd.Flags().GetBool("words")
+
+	fileName := args[0]
 	fileStat, err := os.Stat(fileName)
 
 	if err != nil {
@@ -57,7 +74,7 @@ func main() {
 
 	for scanner.Scan() {
 		lineCount++
-		if *countWords {
+		if countWords {
 			wordCount += countWordsInString(scanner.Text())
 		}
 	}
@@ -67,12 +84,11 @@ func main() {
 		return
 	}
 
-	if *countLines {
+	if countLines {
 		fmt.Printf("    %d %s\n", lineCount, fileName)
 	} else {
 		fmt.Printf("    %d %s\n", wordCount, fileName)
 	}
-
 }
 
 func countWordsInString(str string) int {
